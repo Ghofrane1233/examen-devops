@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         DOCKER_CREDENTIALS_ID = '14ba558b-fe07-4902-be32-d3a89e23f858' // ID des credentials Docker Hub
-        DOCKER_IMAGE_NAME = 'votre_nom_utilisateur/examen-devops'      // Remplacez par votre nom d'utilisateur Docker Hub
+        DOCKER_IMAGE_NAME = 'ghofrane694/examen-devops'      // Remplacez par votre nom d'utilisateur Docker Hub
     }
     stages {
         stage('Checkout') {
