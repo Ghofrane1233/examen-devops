@@ -1,60 +1,45 @@
 pipeline {
     agent any
-
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')  // Remplacez par vos identifiants Docker Hub
-        DOCKER_IMAGE_NAME = "ghofrane694/spring-boot-app"  // Remplacez par le nom de votre image Docker
+        DOCKER_CREDENTIALS_ID = '14ba558b-fe07-4902-be32-d3a89e23f858' // ID des credentials Docker Hub
+        DOCKER_IMAGE_NAME = 'votre_nom_utilisateur/examen-devops'      // Remplacez par votre nom d'utilisateur Docker Hub
     }
-
-    triggers {
-        pollSCM('*/5 * * * *')  // Polling GitHub toutes les 5 minutes
-    }
-
     stages {
         stage('Checkout') {
             steps {
-                // Récupère le code depuis GitHub
-                git 'https://github.com/Ghofrane1233/examen-devops.git'  // Remplacez par l'URL de votre dépôt
+                echo 'Cloning the repository...'
+                git branch: 'main', url: 'https://github.com/Ghofrane1233/examen-devops.git'
             }
         }
-
         stage('Build') {
             steps {
-                // Effectue le build du projet Spring Boot
-                sh './mvnw clean package -DskipTests'  // Vous pouvez aussi remplacer cette commande par 'mvn clean install'
+                echo 'Building the Spring Boot project...'
+                sh './gradlew build'
             }
         }
-
-        stage('Build Docker Image') {
+        stage('Docker Build') {
             steps {
-                script {
-                    // Créer l'image Docker à partir du Dockerfile
-                    docker.build(DOCKER_IMAGE_NAME)
-                }
+                echo 'Building Docker image...'
+                sh 'docker build -t ${DOCKER_IMAGE_NAME}:latest .'
             }
         }
-
-        stage('Push Docker Image') {
+        stage('Docker Push') {
             steps {
+                echo 'Pushing Docker image to Docker Hub...'
                 script {
-                    // Connexion à Docker Hub
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                    docker.withRegistry('https://registry.hub.docker.com', "${DOCKER_CREDENTIALS_ID}") {
+                        sh 'docker push ${DOCKER_IMAGE_NAME}:latest'
                     }
-
-                    // Push de l'image Docker sur Docker Hub
-                    sh "docker push $DOCKER_IMAGE_NAME"
                 }
             }
         }
     }
-
     post {
         success {
-            echo 'Le pipeline a réussi!'
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'Le pipeline a échoué.'
+            echo 'Pipeline failed.'
         }
     }
 }
