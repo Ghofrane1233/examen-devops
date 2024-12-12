@@ -17,6 +17,22 @@ pipeline {
                 sh 'java -version'
             }
         }
+        stage('Configure Java Home') {
+            steps {
+                echo 'Configuring JAVA_HOME...'
+                sh '''
+                export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+                export PATH=$JAVA_HOME/bin:$PATH
+                echo $JAVA_HOME
+                '''
+            }
+        }
+        stage('Clean') {
+            steps {
+                echo 'Cleaning the project...'
+                sh './gradlew clean'
+            }
+        }
         stage('Build') {
             steps {
                 echo 'Building the Spring Boot project...'
