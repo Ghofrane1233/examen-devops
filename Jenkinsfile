@@ -2,13 +2,19 @@ pipeline {
     agent any
     environment {
         DOCKER_CREDENTIALS_ID = '14ba558b-fe07-4902-be32-d3a89e23f858' // ID des credentials Docker Hub
-        DOCKER_IMAGE_NAME = 'ghofrane694/examen-devops'      // Remplacez par votre nom d'utilisateur Docker Hub
+        DOCKER_IMAGE_NAME = 'ghofrane694/examen-devops'               // Remplacez par votre nom d'utilisateur Docker Hub
     }
     stages {
         stage('Checkout') {
             steps {
                 echo 'Cloning the repository...'
                 git branch: 'main', url: 'https://github.com/Ghofrane1233/examen-devops.git'
+            }
+        }
+        stage('Check Java Version') {
+            steps {
+                echo 'Checking Java version...'
+                sh 'java -version'
             }
         }
         stage('Build') {
